@@ -17,32 +17,42 @@
         <StackPanel Orientation="Horizontal" Spacing="30">
             <StackPanel HorizontalAlignment="Center">
                 <TextBox
+                    HorizontalAlignment="Center"
                     Margin="0,40,0,0"
                     PlaceholderText="Username"
+                    Width="150"
                     Text="{Binding User.Username}"/>
                 <TextBox
+                    HorizontalAlignment="Center"
                     Margin="0,40,0,0"
                     PlaceholderText="Password"
+                    Width="150"
                     Text="{Binding User.Password}"
                     PasswordChar="*"/>
                 <Button
-                    Margin="80"
+                    HorizontalAlignment="Center"
+                    Margin="0,80,0,0"
                     Content="Login"
                     Command="{Binding NavigateCommand}"
                     Classes="loginButton"/>
                 <TextBlock
-                    Margin="80"/>
+                    HorizontalAlignment="Center"
+                    Margin="80"
+                    Width="350"
+                    Height="100"
+                    Text="{Binding StatusMessage}" TextWrapping="Wrap"/>
             </StackPanel>
             
             <StackPanel HorizontalAlignment="Center">
                 <TextBox
                     Margin="0,40,0,0"
                     PlaceholderText="Server address"
-                    Text="{Binding Host.Address}"/>
+                    Text="{Binding Address}"/>
                 <TextBox
                     Margin="0,40,0,0"
                     PlaceholderText="Server port"
-                    Text="{Binding Host.Port}"/>
+                    Text="{Binding Port}"
+                    />
                 <Button
                     Margin="80"
                     Content="Connect"

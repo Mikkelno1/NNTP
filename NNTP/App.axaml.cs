@@ -6,6 +6,7 @@ using AvaloniaExercises.Views;
 using NNTP.ViewModels;
 using NNTP.Views;
 using Microsoft.Extensions.DependencyInjection;
+using NNTP.Models;
 using NNTP.Services;
 using NNTP.ViewModels;
 using NNTP.Views;
@@ -64,6 +65,7 @@ public partial class App : Application
 
         //Singletons are primarily used for navigation to windows where the window instance should always be the same
         services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IConnection, Connection>();
         services.AddSingleton<MainViewModel>();
         
         //Transients are primarily used for navigation to windows where the window needs to return to a default state
@@ -71,8 +73,11 @@ public partial class App : Application
         //login view, as the state would be saved with a singleton and not reset as with a transient
         services.AddTransient<ArticleViewModel>();
         services.AddTransient<LoginViewModel>();
-
-        services.AddTransient<Connection>();
+        
+        services.AddTransient<INewsGroupService, NewsGroupService>();
+        services.AddTransient<Article>();
+        services.AddTransient<NewsGroup>();
+        
 
         //Builds and returns our DI-container
         return services.BuildServiceProvider();

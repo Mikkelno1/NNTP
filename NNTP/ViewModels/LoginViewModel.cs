@@ -1,8 +1,10 @@
 using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NNTP.Models;
 using NNTP.Services;
+using System.Linq;
 
 namespace NNTP.ViewModels;
 
@@ -12,16 +14,24 @@ public partial class LoginViewModel : ViewModelBase
 
     private readonly INavigationService _navigationService;
 
+    [ObservableProperty] private string _address;
+
+    [ObservableProperty] private string _port;
+
     [ObservableProperty] 
     private Host _host = new();
 
     [ObservableProperty] 
     private User _user = new();
 
-    private IConnection _connection = new Connection();
+    [ObservableProperty] 
+    private string _statusMessage = "";
 
-    public LoginViewModel(INavigationService navigationService)
+    private IConnection _connection;
+
+    public LoginViewModel(INavigationService navigationService, IConnection connection)
     {
+        _connection = connection;
         _navigationService = navigationService;
 
         _validUser = new()
@@ -29,7 +39,6 @@ public partial class LoginViewModel : ViewModelBase
             Username = "miknor",
             Password = "1234"
         };
-        
         
         _user.PropertyChanged += (sender, args) => NavigateCommand.NotifyCanExecuteChanged();
     }
@@ -49,10 +58,33 @@ public partial class LoginViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void Connect()
+    private async Task Connect()
     {
-        Console.WriteLine(Host.Address);
-        _connection.Connect(Host);
+        Host.Address = Address;
+        
+        int number;
+        
+        if (int.TryParse(Port, out number))
+        {
+            Host.Port = number;
+        }
+        else
+        {
+            StatusMessage = "Error, please enter digits only";
+            return;
+        }
+        
+        try
+        {
+            await _connection.Connect(Host);
+
+            StatusMessage = "Connected to: " + Host.Address + " \nThrough port: " + Host.Port;
+        }
+        catch (Exception e)
+        {
+            StatusMessage = e.Message;
+        }
+        
     }
     
 }

@@ -1,8 +1,12 @@
-﻿using NNTP.Models;
+﻿using System.IO;
+using System.Threading.Tasks;
+using NNTP.Models;
 
 namespace NNTP.Services;
 
 public interface IConnection
 {
-     public void Connect(Host host);
+     public Task Connect(Host host);
+
+     public Stream ReturnStream();
 }

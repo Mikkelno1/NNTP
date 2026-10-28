@@ -1,14 +1,17 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NNTP.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="NNTP.Views.ArticleView">
+             x:Class="NNTP.Views.ArticleView"
+             x:DataType="vm:ArticleViewModel">
     
     
     <Grid 
         ColumnDefinitions="150,*,*"
-        RowDefinitions="*,*,*">
+        RowDefinitions="*,*,*"
+        Margin="0,20,0,0">
         <StackPanel Grid.Column="0" Grid.Row="0">
             <Button 
                 Content="Save" 
@@ -24,12 +27,18 @@
             <ListBox 
                 Height="400" 
                 Margin="0,0,0,40"
+                ItemsSource="{Binding NewsGroups}"
                 x:Name="NewsgroupList"
                 IsVisible="True"/>
             <ListBox 
                 Height="150"
                 x:Name="SavedList"
                 IsVisible="True"/>
+            <TextBlock
+                HorizontalAlignment="Center"
+                Margin="0,40"
+                Text="{Binding StatusCode}"
+                TextWrapping="Wrap"/>
         </StackPanel>
         
         <StackPanel Grid.Column="2" Grid.Row="0">
@@ -43,7 +52,18 @@
                 Width="150"
                 Margin="40"
                 PlaceholderText="Enter prompt"
-                x:Name="PromptBox"></TextBox>
+                Text="{Binding NntpCommand}"
+                x:Name="PromptBox">
+                <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter" Command="{Binding PromptCommand}"/>
+                </TextBox.KeyBindings>
+            </TextBox>
+            <TextBlock
+                Margin="0,40"
+                HorizontalAlignment="Center"
+                Text="{Binding StatusMessagePrompt}"
+                TextWrapping="Wrap"/>
+
         </StackPanel>
     </Grid>
     
