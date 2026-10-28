@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:NNTP.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="NNTP.Views.LoginView"
+        x:DataType="vm:LoginViewModel"
+        >
+
+    <Design.DataContext>
+        <vm:LoginViewModel />
+    </Design.DataContext>
+
+    
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="30">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBox
+                    Margin="0,40,0,0"
+                    PlaceholderText="Username"
+                    Text="{Binding User.Username}"/>
+                <TextBox
+                    Margin="0,40,0,0"
+                    PlaceholderText="Password"
+                    Text="{Binding User.Password}"
+                    PasswordChar="*"/>
+                <Button
+                    Margin="80"
+                    Content="Login"
+                    Command="{Binding NavigateCommand}"
+                    Classes="loginButton"/>
+                <TextBlock
+                    Margin="80"/>
+            </StackPanel>
+            
+            <StackPanel HorizontalAlignment="Center">
+                <TextBox
+                    Margin="0,40,0,0"
+                    PlaceholderText="Server address"
+                    Text="{Binding Host.Address}"/>
+                <TextBox
+                    Margin="0,40,0,0"
+                    PlaceholderText="Server port"
+                    Text="{Binding Host.Port}"/>
+                <Button
+                    Margin="80"
+                    Content="Connect"
+                    Command="{Binding ConnectCommand}"
+                    Classes="loginButton"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+</Window>

@@ -1,0 +1,96 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Generel baggrund og standard skrifttype (Terminal-agtig) -->
+    <Style Selector="Window, UserControl">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+        <Setter Property="FontFamily" Value="Consolas, Courier New, Monospace" />
+    </Style>
+
+    <!-- Tekstbokse: Helt sort baggrund, grøn tekst og grøn placeholder globalt -->
+    <Style Selector="TextBox">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CaretBrush" Value="#FF00FF66" />
+        <Setter Property="PlaceholderForeground" Value="#FF00FF66" />
+    </Style>
+    
+    <!-- Lås sort baggrund og grøn kant fast ved pointerover for TextBox -->
+    <Style Selector="TextBox:pointerover">
+        <Setter Property="Foreground" Value="#FF00FF66" />
+    </Style>
+    
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Lås sort baggrund og grøn kant fast ved fokus for TextBox -->
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="TextBox:focus">
+        <Setter Property="Foreground" Value="#FF00FF66" />
+    </Style>
+
+    <!-- ListBox: Helt sort baggrund, grøn kant og grøn tekst -->
+    <Style Selector="ListBox">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Lås sort baggrund og grøn kant fast for ListBox ved pointerover og fokus -->
+    <Style Selector="ListBox:pointerover /template/ Border#border">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+    </Style>
+
+    <Style Selector="ListBox:focus /template/ Border#border">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+    </Style>
+
+    <!-- Standard knapper -->
+    <Style Selector="Button">
+        <Setter Property="Background" Value="#FF1F1F1F" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    
+    <Style Selector="Button /template/ ContentPresenter">
+        <Setter Property="Background" Value="#FF1F1F1F" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+    </Style>
+
+    <!-- Loginknap (Sort terminal-stil med grøn tekst) -->
+    <Style Selector="Button.loginButton /template/ ContentPresenter">
+        <Setter Property="Background" Value="#FF0C0C0C" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <Style Selector="Button.loginButton:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#FF141414" />
+        <Setter Property="Foreground" Value="#FF00FF66" />
+        <Setter Property="BorderBrush" Value="#FF00FF66" />
+    </Style>
+
+    <!-- Standard tekst -->
+    <Style Selector="TextBlock">
+        <Setter Property="Foreground" Value="#FF00FF66" />
+    </Style>
+
+</Styles>
