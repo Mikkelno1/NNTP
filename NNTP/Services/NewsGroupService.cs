@@ -118,7 +118,7 @@ public class NewsGroupService : INewsGroupService
                     article.xref = line;
                     break;
                 default:
-                    article.extraValues[word[0]] = line.Substring(word[0].Length + 2);
+                    article.extraValues[word[0]] = line;
                     break;
             }
         }
@@ -131,12 +131,11 @@ public class NewsGroupService : INewsGroupService
         _sw.AutoFlush = true;
         
         await _sw.WriteLineAsync(command);
+        
+        Console.WriteLine(command + " this is the command");
     }
 
     
-    
-    
-    /*
     
     
     public async Task<(string Statuscode, List<Group> groups)>FetchGroupArticleListAsync()
@@ -153,79 +152,45 @@ public class NewsGroupService : INewsGroupService
             };
         });
     }
-    */
     
-    public async Task<(string, List<Group>)> GetGroupList()
+    public async Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync()
+    {
+        return await GetListAsync(line =>
+        {
+            var words = line.Split(' ');
+            return new NewsGroup
+            {
+                name = words[0],
+                first = words[1],
+                last = words[2],
+                type = words[3]
+            };
+        });
+    }
+    
+    public async Task<(string statusCode, Group group)> GetGroupList()
     {
         string line = await _sr.ReadLineAsync();
         
-        
-        char delimiter = ' ';
-        
-        List<Group> groupList = new();
-        
-        
-        if (line == null ||line.Equals("."))
+        if (line == null)
         {
-            return (line, groupList);
-        }
-            
-        string[] word = line.Split(delimiter);
-
-        if (word.Length >= 5)
-        {
-            Group group = new Group();
-            
-            _statusCode = word[0];
-            group.numberOfArticles = word[1];
-            group.firstArticleNumber = word[2];
-            group.lastArticleNumber = word[3];
-            group.groupName = word[4];
-            
-            groupList.Add(group);
+            return ("null", new Group());
         }
 
-        return (_statusCode, groupList);
+        string[] words = line.Split(' ');
+        _statusCode = words[0];
+
+        Group group = new Group
+        {
+            numberOfArticles = words[1],
+            firstArticleNumber = words[2],
+            lastArticleNumber = words[3],
+            groupName = words[4]
+        };
+
+        return (_statusCode, group);
     }
     
-    public async Task<(string, List<NewsGroup>)> GetNewsGroupList()
-    {
-        string line;
-        char delimiter = ' ';
-        _statusCodeNewsGroup = await _sr.ReadLineAsync();
-
-        List<NewsGroup> newsGroupList = new();
-        
-        while (true)
-        {
-            line = await _sr.ReadLineAsync();
-            
-            if (line == null || line.Equals("."))
-            {
-                break;
-            }
-            
-            
-            string[] word = line.Split(delimiter);
-
-            if (word.Length >= 4)
-            {
-                NewsGroup ngs = new();
-                ngs.name = word[0];
-                ngs.first = word[1];
-                ngs.last = word[2];
-                ngs.type = word[3];
-                
-                newsGroupList.Add(ngs);
-            }
-        }
-
-        return (_statusCodeNewsGroup, newsGroupList);
-    }
-    
-    
-    
-    /*
     public async Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse)
     {
         var list = new List<T>();
@@ -257,103 +222,4 @@ public class NewsGroupService : INewsGroupService
 
         return (statusCode, list);
     }
-
-    /*
-    public async Task GetNewsGroupList()
-    {
-        _articleList.Clear();
-        
-        string line;
-        char delimiter = ' ';
-        _statusCodeNewsGroup = await _sr.ReadLineAsync();
-        
-        
-        while (true)
-        {
-            line = await _sr.ReadLineAsync();
-            
-            if (line == null ||line.Equals("."))
-            {
-                return;
-            }
-            
-            _ngs = new();
-            
-            string[] word = line.Split(delimiter);
-
-            _ngs.name = word[0];
-            _ngs.first = word[1];
-            _ngs.last = word[2];
-            _ngs.type = word[3];
-            
-            _articleList.Add(_ngs);
-        }
-    }
-
-    public (string, List<NewsGroup>) ReturnNewsGroupList() => (_statusCodeNewsGroup, _articleList);
-    
-    public async Task GetGroupList()
-    {
-        _groupList.Clear();
-        
-        string line;
-        char delimiter = ' ';
-        _statusCode = await _sr.ReadLineAsync();
-        
-        while (true)
-        {
-            line = await _sr.ReadLineAsync();
-            
-            if (line == null ||line.Equals("."))
-            {
-                return;
-            }
-            
-            _group = new();
-            
-            string[] word = line.Split(delimiter);
-
-            _group.numberOfArticles = word[0];
-            _group.firstArticleNumber = word[1];
-            _group.lastArticleNumber = word[2];
-            _group.groupName = word[3];
-            
-            _groupList.Add(_group);
-        }
-    }
-
-    public async Task<(string, List<T>)> GetList<T>(Func<string, T> parse)
-    {
-        var list = new List<T>();
-        string line = await _sr.ReadLineAsync();
-        string statusCode;
-
-        if (line == null)
-        {
-            statusCode = "null";
-        }
-        else
-        {
-            statusCode = line;
-        }
-        
-        while (true)
-        {
-            line = await _sr.ReadLineAsync();
-            
-            if (line == null || line.Equals("."))
-            {
-                break;
-            }
-
-            T item = parse(line);
-            
-            list.Add(item);
-        }
-
-        return (statusCode, list);
-    }
-    
-    public (string, List<Group>) ReturnGroupList() => (_statusCode, _groupList);
-    */
 }

@@ -30,7 +30,7 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     [RelayCommand]
     private async Task Prompt()
     {
-        var lowerCommand = NntpCommand.ToLower();
+        var lowerCommand = NntpCommand.Trim().ToLower();
         NntpCommand = "";
         StatusMessagePrompt = "";
         string[] command = lowerCommand.Split(" ");
@@ -39,12 +39,12 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
             switch (command[0])
             {
                 case "list" :
-                    await _ngs.CallServerAsync(command[0]);
-                    await GetGroupList();
+                    await _ngs.CallServerAsync(lowerCommand);
+                    await GetNewsGroupList();
                     break;
                 case "group" : 
                     await _ngs.CallServerAsync(lowerCommand);
-                    await GetArticleList();
+                    await GetGroup();
                     break;
                 case "article" :
                     await _ngs.CallServerAsync(lowerCommand);
@@ -58,10 +58,10 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         }
     }
     
-    private async Task GetGroupList()
+    private async Task GetNewsGroupList()
     {
         NewsGroupCollection.Clear();
-        var (status, list) = await _ngs.GetNewsGroupList();
+        var (status, list) = await _ngs.FetchNewsGroupListAsync();
 
         StatusCode = status;
         
@@ -72,17 +72,15 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         
     }
     
-    private async Task GetArticleList()
+    private async Task GetGroup()
     {
         NewsGroupCollection.Clear();
-        var (status, list) = await _ngs.GetGroupList();
-       
+        var (status, group) = await _ngs.GetGroupList();
+        
         StatusCode = status;
         
-        foreach (var x in list)
-        {
-            NewsGroupCollection.Add(x);
-        }
+        NewsGroupCollection.Add(group);
+        
     }
 
     private async Task GetArticle()

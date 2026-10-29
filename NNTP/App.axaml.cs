@@ -76,9 +76,6 @@ public partial class App : Application
         services.AddTransient<LoginViewModel>();
         
         
-        
-        
-
         //Builds and returns our DI-container
         return services.BuildServiceProvider();
     }

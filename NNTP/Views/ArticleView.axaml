@@ -42,11 +42,18 @@
         </StackPanel>
         
         <StackPanel Grid.Column="2" Grid.Row="0">
-            <TextBlock 
+            <ListBox 
                 Height="400"
-                Text="{Binding ArticleCollection}"
+                ItemsSource="{Binding ArticleCollection}"
                 Margin="10,0,10,40"
-                x:Name="ArticleList"/>
+                WrapSelection="True"
+                x:Name="ArticleList">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
             <TextBox
                 Height="40"
                 Width="150"

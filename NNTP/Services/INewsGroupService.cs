@@ -8,17 +8,16 @@ namespace NNTP.Services;
 public interface INewsGroupService
 {
     Task CallServerAsync(string command);
-
+    
     Task<Article> FetchArticleAsync();
+    
+    Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
 
-    //Task<(string Statuscode, List<NewsGroup> groups)> FetchGroupAsync();
+    Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse);
 
-    //Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
+    Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync();
 
-    //Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse);
+    Task<(string statusCode, Group group)> GetGroupList();
 
-    public Task<(string, List<Group>)> GetGroupList();
-
-    Task<(string, List<NewsGroup>)> GetNewsGroupList();
 
 }
