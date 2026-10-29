@@ -64,6 +64,7 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         //Singletons are primarily used for navigation to windows where the window instance should always be the same
+        
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<INewsGroupService, NewsGroupService>();
         services.AddSingleton<IConnection, Connection>();

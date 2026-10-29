@@ -22,6 +22,8 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     public ObservableCollection<Object> NewsGroupCollection { get; } = new();
     public ObservableCollection<Article> ArticleCollection { get; } = new();
 
+    public ObservableCollection<Group> GroupCollection { get; } = new();
+
     public ArticleViewModel(INewsGroupService ngs)
     {
         _ngs = ngs;
@@ -60,6 +62,7 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     
     private async Task GetNewsGroupList()
     {
+        StatusCode = "";
         NewsGroupCollection.Clear();
         var (status, list) = await _ngs.FetchNewsGroupListAsync();
 
@@ -74,6 +77,7 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     
     private async Task GetGroup()
     {
+        StatusCode = "";
         NewsGroupCollection.Clear();
         var (status, group) = await _ngs.GetGroupList();
         
@@ -85,11 +89,14 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
 
     private async Task GetArticle()
     {
-        ArticleCollection.Clear();
+        StatusCode = "";
+        NewsGroupCollection.Clear();
 
-        var article = await _ngs.FetchArticleAsync();
+        var (status, article) = await _ngs.FetchArticleAsync();
         
-        ArticleCollection.Add(article);
+        StatusCode = status;
+        
+        NewsGroupCollection.Add(article);
     }
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged;

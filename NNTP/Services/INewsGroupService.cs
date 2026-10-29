@@ -8,8 +8,8 @@ namespace NNTP.Services;
 public interface INewsGroupService
 {
     Task CallServerAsync(string command);
-    
-    Task<Article> FetchArticleAsync();
+
+    Task<(string, Article)> FetchArticleAsync();
     
     Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
 
