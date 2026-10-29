@@ -38,9 +38,12 @@ public class Connection : IConnection
         
         _sw = new StreamWriter(ReturnStream(), leaveOpen:true);
         _sw.AutoFlush = true;
+
+        string initialMessage = await _sr.ReadLineAsync();
+        Console.WriteLine(initialMessage + " this is the server welcome message");
         // (7) Luk i omvendt rækkefølge
         //if (client != null) client.Close();
-        
+
     }
 
     public Stream ReturnStream() => client.GetStream();

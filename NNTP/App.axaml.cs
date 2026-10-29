@@ -67,8 +67,10 @@ public partial class App : Application
         
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<INewsGroupService, NewsGroupService>();
+        services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<IConnection, Connection>();
         services.AddSingleton<MainViewModel>();
+        services.AddSingleton<User>();
         
         //Transients are primarily used for navigation to windows where the window needs to return to a default state
         //A good example is a login window - we don't want login details to be shown if we change views back to the
