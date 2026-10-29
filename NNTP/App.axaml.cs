@@ -65,6 +65,7 @@ public partial class App : Application
 
         //Singletons are primarily used for navigation to windows where the window instance should always be the same
         services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<INewsGroupService, NewsGroupService>();
         services.AddSingleton<IConnection, Connection>();
         services.AddSingleton<MainViewModel>();
         
@@ -74,9 +75,8 @@ public partial class App : Application
         services.AddTransient<ArticleViewModel>();
         services.AddTransient<LoginViewModel>();
         
-        services.AddTransient<INewsGroupService, NewsGroupService>();
-        services.AddTransient<Article>();
-        services.AddTransient<NewsGroup>();
+        
+        
         
 
         //Builds and returns our DI-container

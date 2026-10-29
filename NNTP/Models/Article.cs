@@ -21,6 +21,11 @@ public class Article
     public string xref { get; set; }
     public string message { get; set; }
 
-    public Dictionary<string, string> extraValues { get; set; }
-    
+    public Dictionary<string, string> extraValues { get; set; } = new();
+
+    public override string ToString()
+    {
+        return
+            $"{nameof(articleId)}: {articleId}, {nameof(path)}: {path}, {nameof(fromPoster)}: {fromPoster}, {nameof(newsGroup)}: {newsGroup}, {nameof(subject)}: {subject}, {nameof(date)}: {date}, {nameof(organization)}: {organization}, {nameof(lines)}: {lines}, {nameof(messageId)}: {messageId}, {nameof(injectionDate)}: {injectionDate}, {nameof(injectionInfo)}: {injectionInfo}, {nameof(postingAccount)}: {postingAccount}, {nameof(userAgent)}: {userAgent}, {nameof(cancelLock)}: {cancelLock}, {nameof(xref)}: {xref}, {nameof(message)}: {message}, {nameof(extraValues)}: {extraValues}";
+    }
 }
