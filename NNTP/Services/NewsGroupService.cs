@@ -111,8 +111,6 @@ public class NewsGroupService : INewsGroupService
         _sw.AutoFlush = true;
         
         await _sw.WriteLineAsync(command);
-
-        await GetNewsGroupList();
     }
 
     public async Task GetNewsGroupList()
