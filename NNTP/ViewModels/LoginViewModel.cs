@@ -17,9 +17,7 @@ public partial class LoginViewModel : ViewModelBase
 
     private readonly IAuthService _authService;
 
-    [ObservableProperty] private string _address;
-
-    [ObservableProperty] private string _port;
+    [ObservableProperty] private string _portString;
 
     [ObservableProperty] 
     private Host _host = new();
@@ -54,6 +52,10 @@ public partial class LoginViewModel : ViewModelBase
                 {
                     _navigationService.NavigateTo<ArticleViewModel>();
                 }
+                else
+                {
+                    StatusMessage = "Invalid credentials, try again";
+                }
             }
         }
     }
@@ -66,25 +68,22 @@ public partial class LoginViewModel : ViewModelBase
     [RelayCommand]
     private async Task Connect()
     {
-        Host.Address = Address;
-        
-        int number;
-        
-        if (int.TryParse(Port, out number))
+        _host.Address = Host.Address;
+
+        if (Int32.TryParse(PortString, out int number))
         {
-            Host.Port = number;
+            _host.Port = number;
         }
         else
         {
-            StatusMessage = "Error, please enter digits only";
-            return;
+            StatusMessage = "Invalid characters, only digits allowed";
         }
         
         try
         {
-            await _connection.Connect(Host);
+            await _connection.Connect(_host);
 
-            StatusMessage = "Connected to: " + Host.Address + " \nThrough port: " + Host.Port;
+            StatusMessage = "Connected to: " + _host.Address + " \nThrough port: " + _host.Port;
         }
         catch (Exception e)
         {
@@ -105,10 +104,33 @@ public partial class LoginViewModel : ViewModelBase
     {
         List<string> list = _authService.DecryptInfo();
 
+        
         _user.Username = list[0];
         _user.Password = list[1];
         StatusMessage = list[2];
         
+    }
+
+    [RelayCommand]
+    private void SaveServer()
+    {
+        string serverPort = _host.Port.ToString();
+        StatusMessage = _connection.SaveServer(_host.Address, serverPort);
+    }
+
+    [RelayCommand]
+    private void LoadServer()
+    {
+        List<string> list = _connection.LoadServer();
+
+        _host.Address = list[0];
+
+        if (Int32.TryParse(list[1], out int parsed))
+        {
+            _host.Port = parsed;
+            PortString = list[1];
+        }
+        StatusMessage = list[2];
     }
    
     

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using NNTP.Models;
 
@@ -17,4 +18,8 @@ public interface IConnection
      StreamReader ReturnStreamReader();
 
      StreamWriter ReturnStreamWriter();
+
+     string SaveServer(string serverName, string serverPort);
+
+     List<string> LoadServer();
 }

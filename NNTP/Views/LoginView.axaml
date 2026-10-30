@@ -63,13 +63,13 @@
                     Margin="0,40,0,0"
                     PlaceholderText="Server address"
                     Width="150"
-                    Text="{Binding Address}"/>
+                    Text="{Binding Host.Address}"/>
                 <TextBox
                     HorizontalAlignment="Center"
                     Margin="0,40,0,0"
                     PlaceholderText="Server port"
                     Width="150"
-                    Text="{Binding Port}"/>
+                    Text="{Binding PortString}"/>
                 <Button
                     HorizontalAlignment="Center"
                     Margin="0,80,0,0"
@@ -82,10 +82,12 @@
                     <Button
                         Margin="20,40"
                         Content="Save server"
+                        Command="{Binding SaveServerCommand}"
                         Classes="loginButton"/>
                     <Button
                         Margin="20,40"
                         Content="Load server"
+                        Command="{Binding LoadServerCommand}"
                         Classes="loginButton"/>
                 </StackPanel>
             </StackPanel>

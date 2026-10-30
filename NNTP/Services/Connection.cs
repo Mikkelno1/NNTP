@@ -72,4 +72,62 @@ public class Connection : IConnection
     {
         return _sw;
     }
+
+    public string SaveServer(string serverName, string serverPort)
+    {
+        string statusMesasage = "";
+        
+        try
+        { 
+            using (FileStream fileStream = new(@"C:\Users\Bruger\Desktop\ServerInfo.txt", FileMode.OpenOrCreate))
+            {
+                using (StreamWriter saverWriter = new(fileStream)) {
+                    saverWriter.WriteLine(serverName);
+                    saverWriter.WriteLine(serverPort);
+                }
+            }
+
+            statusMesasage = "Server successfully saved";
+        }
+        catch (Exception e)
+        {
+            statusMesasage = e.Message;
+        }
+
+        return statusMesasage;
+    }
+
+    public List<string> LoadServer()
+    {
+        string statusMesasage = "";
+        string serverName = "";
+        string serverPort = "";
+        List<string> list = new();
+        
+        try
+        {
+            using (FileStream fileStream = new(@"C:\Users\Bruger\Desktop\ServerInfo.txt", FileMode.Open))
+            {
+                using (StreamReader loadWriter = new(fileStream))
+                {
+                    serverName = loadWriter.ReadLine();
+                    list.Add(serverName);
+                            
+                    serverPort = loadWriter.ReadLine();
+                    list.Add(serverPort);
+                }
+                    
+            }
+            statusMesasage = "Server successfully loaded";
+        }
+        catch (Exception e)
+        {
+            statusMesasage = e.Message;
+            
+        }
+        
+        list.Add(statusMesasage);
+
+        return list;
+    }
 }
