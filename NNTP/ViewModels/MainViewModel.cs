@@ -10,4 +10,10 @@ public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty] private ViewModelBase _currentPage;
     
+    private IConnection _connection;
+
+    public MainViewModel(IConnection connection)
+    {
+        _connection = connection;
+    }
 }

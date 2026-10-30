@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,6 +14,8 @@ public partial class LoginViewModel : ViewModelBase
     private readonly User _validUser;
 
     private readonly INavigationService _navigationService;
+
+    private readonly IAuthService _authService;
 
     [ObservableProperty] private string _address;
 
@@ -29,33 +32,36 @@ public partial class LoginViewModel : ViewModelBase
 
     private IConnection _connection;
 
-    public LoginViewModel(INavigationService navigationService, IConnection connection)
+    public LoginViewModel(INavigationService navigationService, IConnection connection, IAuthService authService)
     {
         _connection = connection;
         _navigationService = navigationService;
-
-        _validUser = new()
-        {
-            Username = "miknor",
-            Password = "1234"
-        };
+        _authService = authService;
         
+        Console.WriteLine("username" + _user.Username);
+        Console.WriteLine("password" + _user.Password);
         _user.PropertyChanged += (sender, args) => NavigateCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand(CanExecute = nameof(CanLogin))]
-    private void Navigate()
+    [RelayCommand]
+    private async Task Navigate()
     {
-        _navigationService.NavigateTo<ArticleViewModel>();
+        if (CanLogin())
+        {
+            if (await _authService.AuthenticateUserName(User))
+            {
+                if (await _authService.AuthenticatePassword(User))
+                {
+                    _navigationService.NavigateTo<ArticleViewModel>();
+                }
+            }
+        }
     }
-    
+
     /**
     * Returns true if textblock data matches hardcoded testcase
     */
-    private bool CanLogin()
-    {
-        return User.Username == _validUser.Username && User.Password == _validUser.Password;
-    }
+    private bool CanLogin() => !string.IsNullOrEmpty(_user.Username) && !string.IsNullOrEmpty(_user.Password);
 
     [RelayCommand]
     private async Task Connect()
@@ -86,5 +92,24 @@ public partial class LoginViewModel : ViewModelBase
         }
         
     }
+
+    [RelayCommand]
+    private void EncryptInformation()
+    {
+        StatusMessage = _authService.EncryptInfo(_user.Username, _user.Password);
+    }
+
+    
+    [RelayCommand]
+    private void DecryptInformation()
+    {
+        List<string> list = _authService.DecryptInfo();
+
+        _user.Username = list[0];
+        _user.Password = list[1];
+        StatusMessage = list[2];
+        
+    }
+   
     
 }

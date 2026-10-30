@@ -19,7 +19,10 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     [ObservableProperty] public string statusMessagePrompt;
     [ObservableProperty] public string statusCode;
 
-    public ObservableCollection<NewsGroup> NewsGroups { get; } = new();
+    public ObservableCollection<Object> NewsGroupCollection { get; } = new();
+    public ObservableCollection<Article> ArticleCollection { get; } = new();
+
+    public ObservableCollection<Group> GroupCollection { get; } = new();
 
     public ArticleViewModel(INewsGroupService ngs)
     {
@@ -29,12 +32,27 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     [RelayCommand]
     private async Task Prompt()
     {
-        var lowerCommand = NntpCommand.ToLower();
+        var lowerCommand = NntpCommand.Trim().ToLower();
+        NntpCommand = "";
+        StatusMessagePrompt = "";
+        string[] command = lowerCommand.Split(" ");
         try
         {
-           await _ngs.CallServer(lowerCommand);
-           NntpCommand = "";
-           await GetNewsList();
+            switch (command[0])
+            {
+                case "list" :
+                    await _ngs.CallServerAsync(lowerCommand);
+                    await GetNewsGroupList();
+                    break;
+                case "group" : 
+                    await _ngs.CallServerAsync(lowerCommand);
+                    await GetGroup();
+                    break;
+                case "article" :
+                    await _ngs.CallServerAsync(lowerCommand);
+                    await GetArticle();
+                    break;
+            }
         }
         catch (Exception e)
         {
@@ -42,18 +60,43 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         }
     }
     
-    private async Task GetNewsList()
+    private async Task GetNewsGroupList()
     {
-        NewsGroups.Clear();
-        var (status, list) = _ngs.ReturnNewsGroupList();
+        StatusCode = "";
+        NewsGroupCollection.Clear();
+        var (status, list) = await _ngs.FetchNewsGroupListAsync();
 
         StatusCode = status;
         
         foreach (var x in list)
         {
-            NewsGroups.Add(x);
+            NewsGroupCollection.Add(x);
         }
         
+    }
+    
+    private async Task GetGroup()
+    {
+        StatusCode = "";
+        NewsGroupCollection.Clear();
+        var (status, group) = await _ngs.GetGroupList();
+        
+        StatusCode = status;
+        
+        NewsGroupCollection.Add(group);
+        
+    }
+
+    private async Task GetArticle()
+    {
+        StatusCode = "";
+        NewsGroupCollection.Clear();
+
+        var (status, article) = await _ngs.FetchArticleAsync();
+        
+        StatusCode = status;
+        
+        NewsGroupCollection.Add(article);
     }
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged;

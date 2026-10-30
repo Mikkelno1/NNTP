@@ -6,7 +6,15 @@ namespace NNTP.Services;
 
 public interface IConnection
 {
-     public Task Connect(Host host);
+     Task Connect(Host host);
 
-     public Stream ReturnStream();
+     Stream ReturnStream();
+
+     bool IsConnected();
+
+     bool CheckStatusCode(string statusCode);
+
+     StreamReader ReturnStreamReader();
+
+     StreamWriter ReturnStreamWriter();
 }

@@ -58,8 +58,7 @@
         <Setter Property="Background" Value="#FF0C0C0C" />
         <Setter Property="BorderBrush" Value="#FF00FF66" />
     </Style>
-
-    <!-- Standard knapper -->
+    
     <Style Selector="Button">
         <Setter Property="Background" Value="#FF1F1F1F" />
         <Setter Property="Foreground" Value="#FF00FF66" />
@@ -72,8 +71,7 @@
         <Setter Property="Background" Value="#FF1F1F1F" />
         <Setter Property="Foreground" Value="#FF00FF66" />
     </Style>
-
-    <!-- Loginknap (Sort terminal-stil med grøn tekst) -->
+    
     <Style Selector="Button.loginButton /template/ ContentPresenter">
         <Setter Property="Background" Value="#FF0C0C0C" />
         <Setter Property="Foreground" Value="#FF00FF66" />
@@ -87,8 +85,7 @@
         <Setter Property="Foreground" Value="#FF00FF66" />
         <Setter Property="BorderBrush" Value="#FF00FF66" />
     </Style>
-
-    <!-- Standard tekst -->
+    
     <Style Selector="TextBlock">
         <Setter Property="Foreground" Value="#FF00FF66" />
     </Style>

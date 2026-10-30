@@ -11,139 +11,253 @@ namespace NNTP.Services;
 public class NewsGroupService : INewsGroupService
 {
     private IConnection _connection;
-    private Article _articleObject;
-    private NewsGroup _ngs;
-
-    private StreamReader _sr = null;
-    private StreamWriter _sw = null;
+    //private Article _articleObject;
+    //private NewsGroup _ngs;
+    //private Group _group;
 
     private List<NewsGroup> _articleList = new();
+    private string _statusCodeNewsGroup;
     private string _statusCode;
     
     
-    public NewsGroupService(IConnection connection, Article article, NewsGroup ngs)
+    public NewsGroupService(IConnection connection)
     {
         _connection = connection;
-        _articleObject = article;
-        _ngs = ngs;
-        _sw = new StreamWriter(_connection.ReturnStream());
-        _sr = new StreamReader(_connection.ReturnStream(), Encoding.ASCII, detectEncodingFromByteOrderMarks: false, bufferSize: 1024);
     }
+    
 
-    public async Task ReadArticle()
+    public async Task<(string, Article)> FetchArticleAsync()
     {
+        var sr = _connection.ReturnStreamReader();
         string delimiter = ": ";
-        string line;
+        string line = await sr.ReadLineAsync();
         bool isMessage = false;
         StringBuilder sb = new();
-
-        while (true)
+        
+        if (line == null)
         {
-            line = await _sr.ReadLineAsync();
-            
-            if (line == null || line.Equals("."))
-            {
-                _articleObject.message = sb.ToString();
-                return;
-            }
-            
-            if (string.IsNullOrEmpty(line))
-            {
-                isMessage = true;
-                continue;
-            }
+            _statusCode = "null";
+        }
+        else
+        {
+            _statusCode = line;
+        } 
 
-            if (isMessage)
+        Article article = new();
+
+
+        if (_connection.CheckStatusCode(_statusCode))
+        {
+            while (true)
             {
-                sb.Append(line).AppendLine();
-                continue;
-            }
-            
-            string[] word = line.Split(delimiter);
-            
-            switch (word[0])
-            {
-                case "From" :
-                    _articleObject.fromPoster = line;
+                line = await sr.ReadLineAsync();
+
+                if (line == null)
+                {
                     break;
-                case "Newsgroups" :
-                    _articleObject.newsGroup = line;
+                }
+
+                if (line.Equals("."))
+                {
+                    article.message = sb.ToString();
                     break;
-                case "Subject" :
-                    _articleObject.subject = line;
-                    break;
-                case "Date" :
-                    _articleObject.date = line;
-                    break;
-                case "organization" :
-                    _articleObject.organization = line;
-                    break;
-                case "Lines" :
-                    _articleObject.lines = line;
-                    break;
-                case "Message-ID" :
-                    _articleObject.messageId = line;
-                    break;
-                case "Injection-Date" :
-                    _articleObject.injectionDate = line;
-                    break;
-                case "Injection-Info" :
-                    _articleObject.injectionInfo = line;
-                    break;
-                case "User-Agent" :
-                    _articleObject.userAgent = line;
-                    break;
-                case "Cancel-Lock" :
-                    _articleObject.cancelLock = line;
-                    break;
-                case "Xref" :
-                    _articleObject.xref = line;
-                    break;
-                default:
-                    _articleObject.extraValues[word[0]] = line.Substring(word[0].Length + 2);
-                    break;
+                }
+
+                if (string.IsNullOrEmpty(line))
+                {
+                    isMessage = true;
+                    continue;
+                }
+
+                if (isMessage)
+                {
+                    sb.Append(line).AppendLine();
+                    continue;
+                }
+
+                string[] word = line.Split(delimiter);
+
+
+                switch (word[0])
+                {
+                    case "From":
+                        article.fromPoster = line;
+                        break;
+                    case "Newsgroups":
+                        article.newsGroup = line;
+                        break;
+                    case "Subject":
+                        article.subject = line;
+                        break;
+                    case "Date":
+                        article.date = line;
+                        break;
+                    case "Organization":
+                        article.organization = line;
+                        break;
+                    case "Lines":
+                        article.lines = line;
+                        break;
+                    case "Message-ID":
+                        article.messageId = line;
+                        break;
+                    case "Injection-Date":
+                        article.injectionDate = line;
+                        break;
+                    case "Injection-Info":
+                        article.injectionInfo = line;
+                        break;
+                    case "User-Agent":
+                        article.userAgent = line;
+                        break;
+                    case "Cancel-Lock":
+                        article.cancelLock = line;
+                        break;
+                    case "Xref":
+                        article.xref = line;
+                        break;
+                    default:
+                        article.extraValues[word[0]] = line;
+                        break;
+                }
             }
         }
+
+        return (_statusCode, article);
     }
 
-    public async Task CallServer(string command)
+    public async Task CallServerAsync(string command)
     {
-        _sw.AutoFlush = true;
+        StreamWriter sw = _connection.ReturnStreamWriter();
         
-        await _sw.WriteLineAsync(command);
-    }
+        Console.WriteLine("This is the streamwriter inside callserver " + _connection.ReturnStreamWriter());
 
-    public async Task GetNewsGroupList()
-    {
-        _articleList.Clear();
-        
-        _sr = new StreamReader(_connection.ReturnStream(), Encoding.ASCII, detectEncodingFromByteOrderMarks: false, bufferSize: 1024);
-        string line;
-        char delimiter = ' ';
-        _statusCode = await _sr.ReadLineAsync();
-        
-        
-        while (true)
+        if (_connection.IsConnected())
         {
-            line = await _sr.ReadLineAsync();
-            
-            if (line == null ||line.Equals("."))
-            {
-                return;
-            }
-            
-            _ngs = new();
-            
-            string[] word = line.Split(delimiter);
-
-            _ngs.name = word[0];
-            _ngs.first = word[1];
-            _ngs.last = word[2];
-            _ngs.type = word[3];
-            
-            _articleList.Add(_ngs);
+            await sw.WriteLineAsync(command);
+            Console.WriteLine(command + " this is the command");
         }
+        else
+        {
+            Console.WriteLine("Not connected");
+        }
+        
+        
     }
 
-    public (string, List<NewsGroup>) ReturnNewsGroupList() => (_statusCode, _articleList);
+    
+    
+    
+    public async Task<(string Statuscode, List<Group> groups)>FetchGroupArticleListAsync()
+    {
+        Console.WriteLine("This is the statuscode inside FetchGroupArticleListAsync " +_statusCode );
+        
+            return await GetListAsync(line =>
+            {
+                var words = line.Split(' ');
+                return new Group
+                {
+                    numberOfArticles = words[0],
+                    firstArticleNumber = words[1],
+                    lastArticleNumber = words[2],
+                    groupName = words[3],
+                };
+            });
+        
+    }
+    
+    public async Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync()
+    {
+        
+           return await GetListAsync(line =>
+                   {
+                       var words = line.Split(' ');
+                       return new NewsGroup
+                       {
+                           name = words[0],
+                           first = words[1],
+                           last = words[2],
+                           type = words[3]
+                       };
+                   }); 
+        
+    }
+    
+    public async Task<(string statusCode, Group group)> GetGroupList()
+    {
+        StreamReader sr = _connection.ReturnStreamReader();
+        string line = await sr.ReadLineAsync();
+        Console.WriteLine(line + " this is line after _sr.ReadLineAsync()");
+        
+        if (line == null)
+        {
+            Console.WriteLine(line + " this is line when line == null");
+            return ("null", new Group());
+        }
+
+        Group group = new();
+        string[] words = line.Split(' ');
+        _statusCode = words[0];
+
+        if (_connection.CheckStatusCode(_statusCode) && words.Length >= 5)
+        {
+            
+            group.numberOfArticles = words[1];
+            group.firstArticleNumber = words[2];
+            group.lastArticleNumber = words[3];
+            group.groupName = words[4];
+            
+        }
+        else
+        {
+            group.numberOfArticles = "";
+            group.firstArticleNumber = "";
+            group.lastArticleNumber = "";
+            group.groupName = "";
+        }
+
+        return (_statusCode, group);
+    }
+    
+    public async Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse)
+    {
+        var list = new List<T>();
+        var sr = _connection.ReturnStreamReader();
+        string line = await sr.ReadLineAsync();
+        
+        
+
+        if (line == null)
+        {
+            _statusCode = "null";
+        }
+        else
+        {
+            string[] words = line.Split(' ');
+            _statusCode = words[0];
+        }
+
+        Console.WriteLine("This is the statuscode inside FetchNewsGroupListAsync " +_statusCode );
+        
+        
+        if (_connection.CheckStatusCode(_statusCode))
+        {
+            while (true)
+            {
+                line = await sr.ReadLineAsync();
+            
+                if (line == null || line.Equals("."))
+                {
+                    break;
+                }
+
+                T item = parse(line);
+            
+                list.Add(item);
+            }
+        }
+        
+        return (_statusCode, list);
+    }
+    
 }

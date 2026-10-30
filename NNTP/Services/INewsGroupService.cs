@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NNTP.Models;
 
@@ -6,12 +7,17 @@ namespace NNTP.Services;
 
 public interface INewsGroupService
 {
-    Task CallServer(string command);
+    Task CallServerAsync(string command);
 
-    Task ReadArticle();
+    Task<(string, Article)> FetchArticleAsync();
+    
+    Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
 
-    Task GetNewsGroupList();
+    Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse);
 
-    (string, List<NewsGroup>) ReturnNewsGroupList();
+    Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync();
+
+    Task<(string statusCode, Group group)> GetGroupList();
+
 
 }
