@@ -126,7 +126,7 @@ public class AuthService : IAuthService
                 using (Aes aes = Aes.Create())
                 {
                     byte[] iv = new byte[aes.IV.Length];
-                    int numBytesRead = 0;
+                    fileStream.Read(iv, 0, iv.Length);
                     
                     
                     byte[] key =
