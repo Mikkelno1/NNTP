@@ -36,9 +36,9 @@ public partial class LoginViewModel : ViewModelBase
         _navigationService = navigationService;
         _authService = authService;
         
-        Console.WriteLine("username" + _user.Username);
-        Console.WriteLine("password" + _user.Password);
-        _user.PropertyChanged += (sender, args) => NavigateCommand.NotifyCanExecuteChanged();
+        Console.WriteLine("username" + User.Username);
+        Console.WriteLine("password" + User.Password);
+        User.PropertyChanged += (sender, args) => NavigateCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand]
@@ -63,27 +63,26 @@ public partial class LoginViewModel : ViewModelBase
     /**
     * Returns true if textblock data matches hardcoded testcase
     */
-    private bool CanLogin() => !string.IsNullOrEmpty(_user.Username) && !string.IsNullOrEmpty(_user.Password);
+    private bool CanLogin() => !string.IsNullOrEmpty(User.Username) && !string.IsNullOrEmpty(User.Password);
 
     [RelayCommand]
     private async Task Connect()
     {
-        _host.Address = Host.Address;
-
         if (Int32.TryParse(PortString, out int number))
         {
-            _host.Port = number;
+            Host.Port = number;
         }
         else
         {
             StatusMessage = "Invalid characters, only digits allowed";
+            return;
         }
         
         try
         {
-            await _connection.Connect(_host);
+            await _connection.Connect(Host);
 
-            StatusMessage = "Connected to: " + _host.Address + " \nThrough port: " + _host.Port;
+            StatusMessage = "Connected to: " + Host.Address + " \nThrough port: " + Host.Port;
         }
         catch (Exception e)
         {
@@ -95,7 +94,7 @@ public partial class LoginViewModel : ViewModelBase
     [RelayCommand]
     private void EncryptInformation()
     {
-        StatusMessage = _authService.EncryptInfo(_user.Username, _user.Password);
+        StatusMessage = _authService.EncryptInfo(User.Username, User.Password);
     }
 
     
@@ -105,8 +104,8 @@ public partial class LoginViewModel : ViewModelBase
         List<string> list = _authService.DecryptInfo();
 
         
-        _user.Username = list[0];
-        _user.Password = list[1];
+        User.Username = list[0];
+        User.Password = list[1];
         StatusMessage = list[2];
         
     }
@@ -114,8 +113,8 @@ public partial class LoginViewModel : ViewModelBase
     [RelayCommand]
     private void SaveServer()
     {
-        string serverPort = _host.Port.ToString();
-        StatusMessage = _connection.SaveServer(_host.Address, serverPort);
+        string serverPort = Host.Port.ToString();
+        StatusMessage = _connection.SaveServer(Host.Address, serverPort);
     }
 
     [RelayCommand]
@@ -123,11 +122,11 @@ public partial class LoginViewModel : ViewModelBase
     {
         List<string> list = _connection.LoadServer();
 
-        _host.Address = list[0];
+        Host.Address = list[0];
 
         if (Int32.TryParse(list[1], out int parsed))
         {
-            _host.Port = parsed;
+            Host.Port = parsed;
             PortString = list[1];
         }
         StatusMessage = list[2];
