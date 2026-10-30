@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -91,5 +92,24 @@ public partial class LoginViewModel : ViewModelBase
         }
         
     }
+
+    [RelayCommand]
+    private void EncryptInformation()
+    {
+        StatusMessage = _authService.EncryptInfo(_user.Username, _user.Password);
+    }
+
+    
+    [RelayCommand]
+    private void DecryptInformation()
+    {
+        List<string> list = _authService.DecryptInfo();
+
+        _user.Username = list[0];
+        _user.Password = list[1];
+        StatusMessage = list[2];
+        
+    }
+   
     
 }

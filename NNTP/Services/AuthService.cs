@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using NNTP.Models;
 
@@ -63,5 +65,99 @@ public class AuthService : IAuthService
         }
 
         return access;
+    }
+
+    
+    public string EncryptInfo(string username, string password)
+    {
+        string statusMesasage = "";
+        
+        try
+        {
+
+            using (FileStream fileStream = new(@"C:\Users\Bruger\Desktop\UserInfo.txt", FileMode.OpenOrCreate))
+            {
+                using (Aes aes = Aes.Create())
+                {
+                    byte[] key =
+                    {
+                        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                        0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16
+                    };
+                    aes.Key = key;
+
+                    byte[] iv = aes.IV;
+                    fileStream.Write(iv, 0, iv.Length);
+
+                    using (CryptoStream encryptionStream = new(fileStream, aes.CreateEncryptor(key, iv), CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter encryptWriter = new(encryptionStream))
+                        {
+                            encryptWriter.WriteLine(username);
+                            encryptWriter.WriteLine(password);
+                        }
+                    }
+                }
+            }
+
+            statusMesasage = "Info successfully encrypted";
+        }
+        catch (Exception e)
+        {
+            statusMesasage = e.Message;
+        }
+
+        return statusMesasage;
+    }
+
+    
+    public List<string> DecryptInfo()
+    {
+        string statusMesasage = "";
+        string username = "";
+        string password = "";
+        List<string> list = new();
+        
+        try
+        {
+
+            using (FileStream fileStream = new(@"C:\Users\Bruger\Desktop\UserInfo.txt", FileMode.Open))
+            {
+                using (Aes aes = Aes.Create())
+                {
+                    byte[] iv = new byte[aes.IV.Length];
+                    int numBytesRead = 0;
+                    
+                    
+                    byte[] key =
+                    {
+                        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                        0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16
+                    };
+                    
+                    using (CryptoStream decryptionStream = new(fileStream, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read))
+                    {
+                        using (StreamReader decryptReader = new(decryptionStream))
+                        {
+                            username = decryptReader.ReadLine();
+                            list.Add(username);
+                            
+                            password = decryptReader.ReadLine();
+                            list.Add(password);
+                        }
+                    }
+                }
+            }
+
+            statusMesasage = "Info successfully decrypted";
+        }
+        catch (Exception e)
+        {
+            statusMesasage = e.Message;
+        }
+        
+        list.Add(statusMesasage);
+
+        return list;
     }
 }

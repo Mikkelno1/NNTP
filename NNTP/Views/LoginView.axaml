@@ -14,7 +14,7 @@
 
     
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel Orientation="Horizontal" Spacing="30">
+        <StackPanel Orientation="Horizontal" Spacing="60">
             <StackPanel HorizontalAlignment="Center">
                 <TextBox
                     HorizontalAlignment="Center"
@@ -35,9 +35,23 @@
                     Content="Login"
                     Command="{Binding NavigateCommand}"
                     Classes="loginButton"/>
+                <StackPanel 
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+                    <Button
+                        Margin="20,40"
+                        Content="Save user"
+                        Command="{Binding EncryptInformationCommand}"
+                        Classes="loginButton"/>
+                    <Button
+                        Margin="20,40"
+                        Content="Load user"
+                        Command="{Binding DecryptInformationCommand}"
+                        Classes="loginButton"/>
+                </StackPanel>
                 <TextBlock
                     HorizontalAlignment="Center"
-                    Margin="80"
+                    Margin="0,80,0,0"
                     Width="350"
                     Height="100"
                     Text="{Binding StatusMessage}" TextWrapping="Wrap"/>
@@ -45,19 +59,35 @@
             
             <StackPanel HorizontalAlignment="Center">
                 <TextBox
+                    HorizontalAlignment="Center"
                     Margin="0,40,0,0"
                     PlaceholderText="Server address"
+                    Width="150"
                     Text="{Binding Address}"/>
                 <TextBox
+                    HorizontalAlignment="Center"
                     Margin="0,40,0,0"
                     PlaceholderText="Server port"
-                    Text="{Binding Port}"
-                    />
+                    Width="150"
+                    Text="{Binding Port}"/>
                 <Button
-                    Margin="80"
+                    HorizontalAlignment="Center"
+                    Margin="0,80,0,0"
                     Content="Connect"
                     Command="{Binding ConnectCommand}"
                     Classes="loginButton"/>
+                <StackPanel 
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+                    <Button
+                        Margin="20,40"
+                        Content="Save server"
+                        Classes="loginButton"/>
+                    <Button
+                        Margin="20,40"
+                        Content="Load server"
+                        Classes="loginButton"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Grid>
