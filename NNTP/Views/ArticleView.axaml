@@ -16,11 +16,23 @@
             <Button 
                 Content="Save" 
                 Margin="80,200,0,0"
+                Classes="loginButton"
+                Command="{Binding AddToFavoriteCommand}"
                 x:Name="SaveButton"/>
-            <Button 
-                Content="Delete" 
-                Margin="67,275,0,0"
-                x:Name="DeleteButton"/>
+            <StackPanel Orientation="Vertical">
+                <Button 
+                    Content="Delete group" 
+                    Margin="20,275,0,0"
+                    Classes="loginButton"
+                    Command="{Binding RemoveFromFavoriteCommand}"
+                    x:Name="DeleteButton"/>
+                <Button 
+                    Content="Load articles" 
+                    Margin="20,10,0,0"
+                    Classes="loginButton"
+                    x:Name="LoadButton"/>
+            </StackPanel>
+            
         </StackPanel>
         
         <StackPanel Grid.Column="1" Grid.Row="0">
@@ -28,10 +40,13 @@
                 Height="400" 
                 Margin="0,0,0,40"
                 ItemsSource="{Binding NewsGroupCollection}"
+                SelectedItem="{Binding SelectedNewsGroup}"
                 x:Name="NewsgroupList"
                 IsVisible="True"/>
             <ListBox 
                 Height="150"
+                ItemsSource="{Binding FavoriteCollection}"
+                SelectedItem="{Binding SelectedNewsGroup}"
                 x:Name="SavedList"
                 IsVisible="True"/>
             <TextBlock

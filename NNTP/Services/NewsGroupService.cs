@@ -175,9 +175,9 @@ public class NewsGroupService : INewsGroupService
                        return new NewsGroup
                        {
                            name = words[0],
-                           first = words[1],
-                           last = words[2],
-                           type = words[3]
+                           firstArticleNo = words[1],
+                           lastArticleNo = words[2],
+                           postingStatus = words[3]
                        };
                    }); 
         

@@ -3,12 +3,12 @@
 public class NewsGroup
 {
     public string name { get; set; }
-    public string last { get; set; }
-    public string first { get; set; }
-    public string type { get; set; }
+    public string lastArticleNo { get; set; }
+    public string firstArticleNo { get; set; }
+    public string postingStatus { get; set; }
 
     public override string ToString()
     {
-        return $"{name} {last} {first} {type}";
+        return $"{name} {lastArticleNo} {firstArticleNo} {postingStatus}";
     }
 }
