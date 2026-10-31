@@ -16,6 +16,7 @@ namespace NNTP.ViewModels;
 public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
 {
     private INewsGroupService _ngs;
+    private IConnection _connection;
     
     [ObservableProperty] public string nntpCommand;
     [ObservableProperty] public string statusMessagePrompt;
@@ -31,9 +32,10 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     public ObservableCollection<NewsGroup> FavoriteCollection { get; } = new();
     
 
-    public ArticleViewModel(INewsGroupService ngs)
+    public ArticleViewModel(INewsGroupService ngs, IConnection connection)
     {
         _ngs = ngs;
+        _connection = connection;
         ReadFavorite();
     }
 
@@ -143,27 +145,34 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         NntpCommand = "";
         StatusMessagePrompt = "";
         string[] command = lowerCommand.Split(" ");
+        
+        await _connection.WaitForSemaphore();
         try
         {
             switch (command[0])
             {
-                case "list" :
+                case "list":
                     await _ngs.CallServerAsync(lowerCommand);
                     await GetNewsGroupList();
                     break;
-                case "group" : 
+                case "group":
                     await _ngs.CallServerAsync(lowerCommand);
                     await GetGroup();
                     break;
-                case "article" :
+                case "article":
                     await _ngs.CallServerAsync(lowerCommand);
                     await GetArticle();
                     break;
             }
+            
         }
         catch (Exception e)
         {
             StatusMessagePrompt = e.Message;
+        }
+        finally
+        {
+            _connection.ReleaseSemaphore();
         }
     }
     

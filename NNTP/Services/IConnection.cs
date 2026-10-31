@@ -22,4 +22,8 @@ public interface IConnection
      string SaveServer(string serverName, string serverPort);
 
      List<string> LoadServer();
+
+     Task WaitForSemaphore();
+
+     void ReleaseSemaphore();
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NNTP.Models;
@@ -17,6 +18,7 @@ public class Connection : IConnection
     public TcpClient client;
     private StreamWriter _sw;
     private StreamReader _sr;
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     
     public async Task Connect(Host host)
     {
@@ -32,11 +34,10 @@ public class Connection : IConnection
 
             // (3) Forbind til serveren
         await client.ConnectAsync(address, port);
-
-        var stream = client.GetStream();
-        _sr = new StreamReader(stream, Encoding.ASCII, detectEncodingFromByteOrderMarks: false, 1024, leaveOpen:true);
         
-        _sw = new StreamWriter(stream, leaveOpen:true);
+        _sr = new StreamReader(ReturnStream(), Encoding.ASCII, detectEncodingFromByteOrderMarks: false, 1024, leaveOpen:true);
+        
+        _sw = new StreamWriter(ReturnStream(), Encoding.ASCII, leaveOpen:true);
         _sw.AutoFlush = true;
 
         string initialMessage = await _sr.ReadLineAsync();
@@ -76,12 +77,13 @@ public class Connection : IConnection
     public string SaveServer(string serverName, string serverPort)
     {
         string statusMesasage = "";
-        
+
         try
-        { 
+        {
             using (FileStream fileStream = new(@"C:\Users\Bruger\Desktop\ServerInfo.txt", FileMode.OpenOrCreate))
             {
-                using (StreamWriter saverWriter = new(fileStream)) {
+                using (StreamWriter saverWriter = new(fileStream))
+                {
                     saverWriter.WriteLine(serverName);
                     saverWriter.WriteLine(serverPort);
                 }
@@ -129,5 +131,15 @@ public class Connection : IConnection
         list.Add(statusMesasage);
 
         return list;
+    }
+
+    public async Task WaitForSemaphore()
+    {
+        await _semaphore.WaitAsync();
+    }
+
+    public void ReleaseSemaphore()
+    {
+        _semaphore.Release();
     }
 }

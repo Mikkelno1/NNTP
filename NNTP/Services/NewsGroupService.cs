@@ -261,25 +261,23 @@ public class NewsGroupService : INewsGroupService
 
     public async Task<string> SendCreatedArticle(Article article)
     {
-        StreamWriter sw = _connection.ReturnStreamWriter();
-        StreamReader sr = _connection.ReturnStreamReader();
+        await _connection.WaitForSemaphore();
 
         string statuscode = "";
 
         try
         {
+            StreamWriter sw = _connection.ReturnStreamWriter();
+            StreamReader sr = _connection.ReturnStreamReader();
             await sw.WriteLineAsync(postCommand);
-            
-            await sw.FlushAsync();
-            
             statuscode = await sr.ReadLineAsync();
 
             Console.WriteLine(_connection.IsConnected() + " this is the server connection status");
 
-            if (statuscode.Substring(0,3).Equals("340"))
+            if (statuscode.Substring(0, 3).Equals("340"))
             {
                 await sw.WriteAsync(
-                    "From: <" + article.fromPoster + ">\r\n" +
+                    "From: " + article.fromPoster + "\r\n" +
                     "Newsgroups: " + article.newsGroup + "\r\n" +
                     "Subject: " + article.subject + "\r\n" +
                     "\r\n" +
@@ -288,7 +286,7 @@ public class NewsGroupService : INewsGroupService
 
                 await sw.FlushAsync();
             }
-            
+
             statuscode = await sr.ReadLineAsync();
             Console.WriteLine(statuscode + " this is the statuscode inside FetchCreatedArticle after sending");
         }
@@ -296,6 +294,10 @@ public class NewsGroupService : INewsGroupService
         {
             Console.WriteLine(e);
             throw;
+        }
+        finally
+        {
+            _connection.ReleaseSemaphore();
         }
 
         return statuscode;
