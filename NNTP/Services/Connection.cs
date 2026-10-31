@@ -27,16 +27,16 @@ public class Connection : IConnection
         
 
         // (2) (valgfrit) sæt korte timeouts
-        client.ReceiveTimeout = 3000; 
-        client.SendTimeout = 3000;// ikke så relevant til denne app!
+        client.ReceiveTimeout = 10000; 
+        client.SendTimeout = 10000;// ikke så relevant til denne app!
 
             // (3) Forbind til serveren
         await client.ConnectAsync(address, port);
+
+        var stream = client.GetStream();
+        _sr = new StreamReader(stream, Encoding.ASCII, detectEncodingFromByteOrderMarks: false, 1024, leaveOpen:true);
         
-        
-        _sr = new StreamReader(ReturnStream(), Encoding.ASCII, detectEncodingFromByteOrderMarks: false, 1024, leaveOpen:true);
-        
-        _sw = new StreamWriter(ReturnStream(), leaveOpen:true);
+        _sw = new StreamWriter(stream, leaveOpen:true);
         _sw.AutoFlush = true;
 
         string initialMessage = await _sr.ReadLineAsync();

@@ -11,14 +11,8 @@ namespace NNTP.Services;
 public class NewsGroupService : INewsGroupService
 {
     private IConnection _connection;
-    //private Article _articleObject;
-    //private NewsGroup _ngs;
-    //private Group _group;
 
-    private List<NewsGroup> _articleList = new();
-    private string _statusCodeNewsGroup;
-    private string _statusCode;
-    
+    private const string postCommand = "post";
     
     public NewsGroupService(IConnection connection)
     {
@@ -33,20 +27,21 @@ public class NewsGroupService : INewsGroupService
         string line = await sr.ReadLineAsync();
         bool isMessage = false;
         StringBuilder sb = new();
+        string statuscode = "";
         
         if (line == null)
         {
-            _statusCode = "null";
+            statuscode = "null";
         }
         else
         {
-            _statusCode = line;
+            statuscode = line;
         } 
 
         Article article = new();
 
 
-        if (_connection.CheckStatusCode(_statusCode))
+        if (_connection.CheckStatusCode(statuscode))
         {
             while (true)
             {
@@ -123,7 +118,7 @@ public class NewsGroupService : INewsGroupService
             }
         }
 
-        return (_statusCode, article);
+        return (statuscode, article);
     }
 
     public async Task CallServerAsync(string command)
@@ -147,7 +142,7 @@ public class NewsGroupService : INewsGroupService
 
     
     
-    
+    /*
     public async Task<(string Statuscode, List<Group> groups)>FetchGroupArticleListAsync()
     {
         Console.WriteLine("This is the statuscode inside FetchGroupArticleListAsync " +_statusCode );
@@ -165,6 +160,8 @@ public class NewsGroupService : INewsGroupService
             });
         
     }
+    */
+    
     
     public async Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync()
     {
@@ -180,7 +177,6 @@ public class NewsGroupService : INewsGroupService
                            postingStatus = words[3]
                        };
                    }); 
-        
     }
     
     public async Task<(string statusCode, Group group)> GetGroupList()
@@ -188,6 +184,7 @@ public class NewsGroupService : INewsGroupService
         StreamReader sr = _connection.ReturnStreamReader();
         string line = await sr.ReadLineAsync();
         Console.WriteLine(line + " this is line after _sr.ReadLineAsync()");
+        string statuscode = "";
         
         if (line == null)
         {
@@ -197,9 +194,9 @@ public class NewsGroupService : INewsGroupService
 
         Group group = new();
         string[] words = line.Split(' ');
-        _statusCode = words[0];
+        statuscode = words[0];
 
-        if (_connection.CheckStatusCode(_statusCode) && words.Length >= 5)
+        if (_connection.CheckStatusCode(statuscode) && words.Length >= 5)
         {
             
             group.numberOfArticles = words[1];
@@ -216,31 +213,32 @@ public class NewsGroupService : INewsGroupService
             group.groupName = "";
         }
 
-        return (_statusCode, group);
+        return (statuscode, group);
     }
+    
     
     public async Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse)
     {
         var list = new List<T>();
         var sr = _connection.ReturnStreamReader();
         string line = await sr.ReadLineAsync();
-        
+        string statuscode = "";
         
 
         if (line == null)
         {
-            _statusCode = "null";
+            statuscode = "null";
         }
         else
         {
             string[] words = line.Split(' ');
-            _statusCode = words[0];
+            statuscode = words[0];
         }
 
-        Console.WriteLine("This is the statuscode inside FetchNewsGroupListAsync " +_statusCode );
+        Console.WriteLine("This is the statuscode inside FetchNewsGroupListAsync " +statuscode );
         
         
-        if (_connection.CheckStatusCode(_statusCode))
+        if (_connection.CheckStatusCode(statuscode))
         {
             while (true)
             {
@@ -257,7 +255,50 @@ public class NewsGroupService : INewsGroupService
             }
         }
         
-        return (_statusCode, list);
+        return (statuscode, list);
+    }
+    
+
+    public async Task<string> SendCreatedArticle(Article article)
+    {
+        StreamWriter sw = _connection.ReturnStreamWriter();
+        StreamReader sr = _connection.ReturnStreamReader();
+
+        string statuscode = "";
+
+        try
+        {
+            await sw.WriteLineAsync(postCommand);
+            
+            await sw.FlushAsync();
+            
+            statuscode = await sr.ReadLineAsync();
+
+            Console.WriteLine(_connection.IsConnected() + " this is the server connection status");
+
+            if (statuscode.Substring(0,3).Equals("340"))
+            {
+                await sw.WriteAsync(
+                    "From: <" + article.fromPoster + ">\r\n" +
+                    "Newsgroups: " + article.newsGroup + "\r\n" +
+                    "Subject: " + article.subject + "\r\n" +
+                    "\r\n" +
+                    article.message + "\r\n" +
+                    ".\r\n");
+
+                await sw.FlushAsync();
+            }
+            
+            statuscode = await sr.ReadLineAsync();
+            Console.WriteLine(statuscode + " this is the statuscode inside FetchCreatedArticle after sending");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return statuscode;
     }
     
 }

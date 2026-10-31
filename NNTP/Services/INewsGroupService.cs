@@ -11,13 +11,15 @@ public interface INewsGroupService
 
     Task<(string, Article)> FetchArticleAsync();
     
-    Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
+    //Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
 
     Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse);
 
     Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync();
 
     Task<(string statusCode, Group group)> GetGroupList();
+
+    Task<string> SendCreatedArticle(Article article);
 
 
 }

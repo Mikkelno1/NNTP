@@ -56,20 +56,47 @@
                 TextWrapping="Wrap"/>
         </StackPanel>
         
-        <StackPanel Grid.Column="2" Grid.Row="0">
-            <ListBox 
-                Height="400"
-                Margin="10,0,10,40"
-                WrapSelection="True"
-                x:Name="ArticleList">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+        <StackPanel Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center">
             <TextBox
-                Height="40"
+                Width="150"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Left"
+                PlaceholderText="From"
+                Text="{Binding FromArticle}"
+                x:Name="FromBox"
+                />
+            <TextBox
+                Width="150"
+                Margin="0,30,0,0"
+                HorizontalAlignment="Left"
+                PlaceholderText="Newsgroups"
+                Text="{Binding NewsgroupsArticle}"
+                x:Name="NewsgroupBox"
+            />
+            <TextBox
+                Width="150"
+                Margin="0,30,0,0"
+                HorizontalAlignment="Left"
+                PlaceholderText="Subject"
+                Text="{Binding SubjectArticle}"
+                x:Name="SubjectBox"
+            />
+            <TextBox
+                Width="250"
+                Height="200"
+                Margin="0,30,0,0"
+                PlaceholderText="Message"
+                Text="{Binding MessageArticle}"
+                x:Name="MessageBox"
+            />
+            <Button
+                Content="Create article" 
+                Margin="0,20,0,0"
+                Classes="loginButton"
+                Command="{Binding CreateArticleCommand}"
+                x:Name="ArticleButton"/>
+            
+            <TextBox
                 Width="150"
                 Margin="40"
                 PlaceholderText="Enter prompt"

@@ -21,6 +21,10 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     [ObservableProperty] public string statusMessagePrompt;
     [ObservableProperty] public string statusCode;
     [ObservableProperty] public NewsGroup selectedNewsGroup;
+    [ObservableProperty] public string fromArticle;
+    [ObservableProperty] public string newsgroupsArticle;
+    [ObservableProperty] public string subjectArticle;
+    [ObservableProperty] public string messageArticle;
 
     public ObservableCollection<Object> NewsGroupCollection { get; } = new();
     public ObservableCollection<Article> ArticleCollection { get; } = new();
@@ -118,8 +122,11 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
                     newsGroup.postingStatus = delimiter[3];
                     FavoriteCollection.Add(newsGroup);
                 }
-            
-                StatusMessagePrompt = "Favorites successfully loaded";
+
+                if (readNewsGroup.Length > 0)
+                {
+                    StatusMessagePrompt = "Favorites successfully loaded";
+                }
             }
             
         }
@@ -198,6 +205,25 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         
         NewsGroupCollection.Add(article);
     }
+
+    [RelayCommand]
+    private async Task CreateArticle()
+    {
+        Article article = new();
+
+        article.fromPoster = FromArticle;
+        Console.WriteLine(article.fromPoster + " from poster");
+        article.newsGroup = NewsgroupsArticle;
+        Console.WriteLine(article.newsGroup + " to newsgroup");
+        article.subject = SubjectArticle;
+        Console.WriteLine(article.subject + " article subject");
+        article.message = MessageArticle;
+        Console.WriteLine(article.message + " article message");
+        
+        StatusMessagePrompt = await _ngs.SendCreatedArticle(article);
+    }
+    
+    
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
 }
