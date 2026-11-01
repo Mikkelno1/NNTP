@@ -12,7 +12,7 @@ public interface IConnection
      Stream ReturnStream();
 
      bool IsConnected();
-
+     
      bool CheckStatusCode(string statusCode);
 
      StreamReader ReturnStreamReader();

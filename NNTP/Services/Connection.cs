@@ -56,10 +56,20 @@ public class Connection : IConnection
 
     public bool CheckStatusCode(string statusCode)
     {
+        if (string.IsNullOrEmpty(statusCode))
+        {
+            return false;
+        }
         if (statusCode[0] == '2')
         {
             return true;
+        } 
+        
+        if (statusCode[0] == '3')
+        {
+            return true;
         }
+        
 
         return false;
     }

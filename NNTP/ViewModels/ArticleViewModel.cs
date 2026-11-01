@@ -184,6 +184,7 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
 
         StatusCode = status;
         
+        
         foreach (var x in list)
         {
             NewsGroupCollection.Add(x);
@@ -198,8 +199,11 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         var (status, group) = await _ngs.GetGroupList();
         
         StatusCode = status;
-        
-        NewsGroupCollection.Add(group);
+
+        if (group != null)
+        {
+            NewsGroupCollection.Add(group);
+        }
         
     }
 

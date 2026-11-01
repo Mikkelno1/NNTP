@@ -136,7 +136,6 @@ public class NewsGroupService : INewsGroupService
         {
             Console.WriteLine("Not connected");
         }
-        
     }
 
     
@@ -171,8 +170,8 @@ public class NewsGroupService : INewsGroupService
                        return new NewsGroup
                        {
                            name = words[0],
-                           firstArticleNo = words[1],
-                           lastArticleNo = words[2],
+                           lastArticleNo = words[1],
+                           firstArticleNo= words[2],
                            postingStatus = words[3]
                        };
                    }); 
@@ -206,10 +205,7 @@ public class NewsGroupService : INewsGroupService
         }
         else
         {
-            group.numberOfArticles = "";
-            group.firstArticleNumber = "";
-            group.lastArticleNumber = "";
-            group.groupName = "";
+            group = null;
         }
 
         return (statuscode, group);
@@ -271,8 +267,15 @@ public class NewsGroupService : INewsGroupService
             await sw.WriteLineAsync(postCommand);
             statuscode = await sr.ReadLineAsync();
 
+            await sw.FlushAsync();
+
             Console.WriteLine(_connection.IsConnected() + " this is the server connection status");
 
+            if (string.IsNullOrEmpty(statuscode) || statuscode.Length < 3)
+            {
+                return statuscode;
+            }
+            
             if (statuscode.Substring(0, 3).Equals("340"))
             {
                 await sw.WriteAsync(

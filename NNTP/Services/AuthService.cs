@@ -36,6 +36,11 @@ public class AuthService : IAuthService
         Console.WriteLine(user.Username + " this is the userbname inside AuthenticateUserName");
         Console.WriteLine(statuscode + " this is the statuscode inside AuthenticateUserName");
 
+        if (string.IsNullOrEmpty(statuscode) || statuscode.Length < 3)
+        {
+            return access;
+        }
+        
         if (statuscode.Substring(0,3).Equals("381"))
         {
             access = true;
@@ -60,6 +65,11 @@ public class AuthService : IAuthService
         Console.WriteLine(user.Password + " this is the password inside AuthenticatePassword");
         Console.WriteLine(statuscode + " this is the statuscode inside AuthenticatePassword");
 
+        if (string.IsNullOrEmpty(statuscode) || statuscode.Length < 3)
+        {
+            return access;
+        }
+        
         if (statuscode.Substring(0,3).Equals("281"))
         {
             access = true;
