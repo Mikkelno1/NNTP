@@ -133,6 +133,56 @@ public class ConnectionTest
         
         Assert.Contains(statusMessage, actual);
     }
+
+    [Fact]
+    public async Task WaitforSemaphore_SemaphoreLoadedWhenWaiting()
+    {
+        var connection = new Connection();
+        
+        await connection.WaitForSemaphore();
+        Task wait = connection.WaitForSemaphore();
+        Assert.False(wait.IsCompleted);
+        connection.ReleaseSemaphore();
+        await wait;
+
+        Assert.True(wait.IsCompleted);
+    }
     
+    [Fact]
+    public async Task WaitforSemaphore_SemaphoreNotLoadedBecauseFull()
+    {
+        var connection = new Connection();
+
+        await connection.WaitForSemaphore();
+        Task wait = connection.WaitForSemaphore();
+        Assert.False(wait.IsCompleted);
+        connection.ReleaseSemaphore();
+        await wait;
+        
+        Assert.True(wait.IsCompleted);
+    }
+
+    [Fact]
+    public async Task ReleaseSemaphore_CanRelease()
+    {
+        var connection = new Connection();
+        
+        await connection.WaitForSemaphore();
+        Task wait = connection.WaitForSemaphore();
+        connection.ReleaseSemaphore();
+        await wait;
+        
+        Assert.True(wait.IsCompleted);
+    }
     
+    [Fact]
+    public async Task WaitforSemaphore_SemaphoreNotReleased()
+    {
+        var connection = new Connection();
+
+        await connection.WaitForSemaphore();
+        Task wait = connection.WaitForSemaphore();
+            
+        Assert.False(wait.IsCompleted);
+    }
 }

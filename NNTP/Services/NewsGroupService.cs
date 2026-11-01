@@ -137,7 +137,6 @@ public class NewsGroupService : INewsGroupService
             Console.WriteLine("Not connected");
         }
         
-        
     }
 
     
