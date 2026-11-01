@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace NNTP.Models;
 
+/**
+ * Holds the Article object format used for printing to disc
+ */
 public class Article
 {
     public string articleId { get; set; }

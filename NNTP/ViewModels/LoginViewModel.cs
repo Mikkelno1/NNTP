@@ -5,10 +5,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NNTP.Models;
 using NNTP.Services;
-using System.Linq;
+
 
 namespace NNTP.ViewModels;
 
+/**
+ * Handles all business logic behind the UI related to initial server connectivity
+ */
 public partial class LoginViewModel : ViewModelBase
 {
     private readonly User _validUser;
@@ -38,9 +41,12 @@ public partial class LoginViewModel : ViewModelBase
         
         Console.WriteLine("username" + User.Username);
         Console.WriteLine("password" + User.Password);
-        User.PropertyChanged += (sender, args) => NavigateCommand.NotifyCanExecuteChanged();
+        User.PropertyChanged += (sender, args) => NavigateCommand.NotifyCanExecuteChanged(); //notifies once the user object has changed 
     }
 
+    /**
+     * Handles login chain
+     */
     [RelayCommand]
     private async Task Navigate()
     {
@@ -61,10 +67,13 @@ public partial class LoginViewModel : ViewModelBase
     }
 
     /**
-    * Returns true if textblock data matches hardcoded testcase
+    * Checks if textblocks contains valid data
     */
     private bool CanLogin() => !string.IsNullOrEmpty(User.Username) && !string.IsNullOrEmpty(User.Password);
 
+    /**
+     * Handles connection chain
+     */
     [RelayCommand]
     private async Task Connect()
     {
@@ -91,13 +100,18 @@ public partial class LoginViewModel : ViewModelBase
         
     }
 
+    /**
+     * Displays to the user that their credentials have been encrypted
+     */
     [RelayCommand]
     private void EncryptInformation()
     {
         StatusMessage = _authService.EncryptInfo(User.Username, User.Password);
     }
 
-    
+    /**
+     * Displays to the user that their credentials have been decrypted
+     */
     [RelayCommand]
     private void DecryptInformation()
     {
@@ -110,6 +124,9 @@ public partial class LoginViewModel : ViewModelBase
         
     }
 
+    /**
+     * Displays to the user that their server has been saved to disk
+     */
     [RelayCommand]
     private void SaveServer()
     {
@@ -117,6 +134,9 @@ public partial class LoginViewModel : ViewModelBase
         StatusMessage = _connection.SaveServer(Host.Address, serverPort);
     }
 
+    /**
+     * Displays to the user that their server has been loaded from disk
+     */
     [RelayCommand]
     private void LoadServer()
     {

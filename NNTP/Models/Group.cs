@@ -1,5 +1,8 @@
 ﻿namespace NNTP.Models;
 
+/**
+ * Holds the Group format for printing to disc
+ */
 public class Group
 {
     public string numberOfArticles { get; set; }

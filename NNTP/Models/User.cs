@@ -2,6 +2,9 @@
 
 namespace NNTP.Models;
 
+/**
+ * Defines the User object used to establish connections
+ */
 public partial class User : ObservableObject
 {
     [ObservableProperty] 

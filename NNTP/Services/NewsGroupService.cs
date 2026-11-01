@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NNTP.Models;
 
 namespace NNTP.Services;
 
+/**
+ * Handles all request/response of data from the server related to list (Newsgroups), group (Group) and article (Article) NNTP commands 
+ */
 public class NewsGroupService : INewsGroupService
 {
     private IConnection _connection;
@@ -20,6 +23,9 @@ public class NewsGroupService : INewsGroupService
     }
     
 
+    /**
+     * Fetches Article using the article NNTP command and handles saving data to related Article object
+     */
     public async Task<(string, Article)> FetchArticleAsync()
     {
         var sr = _connection.ReturnStreamReader();
@@ -52,13 +58,13 @@ public class NewsGroupService : INewsGroupService
                     break;
                 }
 
-                if (line.Equals("."))
+                if (line.Equals(".")) //checks if the message has ended
                 {
                     article.message = sb.ToString();
                     break;
                 }
 
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty(line)) //checks if the method has finished appending all headers to related article header attributes
                 {
                     isMessage = true;
                     continue;
@@ -66,7 +72,7 @@ public class NewsGroupService : INewsGroupService
 
                 if (isMessage)
                 {
-                    sb.Append(line).AppendLine();
+                    sb.Append(line).AppendLine(); //if all headers are assigned their attributes, the rest of the article is saved to the message attribute
                     continue;
                 }
 
@@ -121,13 +127,16 @@ public class NewsGroupService : INewsGroupService
         return (statuscode, article);
     }
 
+    /**
+     * Sends NNTP commands to server
+     */
     public async Task CallServerAsync(string command)
     {
         StreamWriter sw = _connection.ReturnStreamWriter();
         
         Console.WriteLine("This is the streamwriter inside callserver " + _connection.ReturnStreamWriter());
 
-        if (_connection.IsConnected())
+        if (_connection.IsConnected()) //checks connection before sending command
         {
             await sw.WriteLineAsync(command);
             Console.WriteLine(command + " this is the command");
@@ -137,33 +146,13 @@ public class NewsGroupService : INewsGroupService
             Console.WriteLine("Not connected");
         }
     }
-
     
-    
-    /*
-    public async Task<(string Statuscode, List<Group> groups)>FetchGroupArticleListAsync()
-    {
-        Console.WriteLine("This is the statuscode inside FetchGroupArticleListAsync " +_statusCode );
-        
-            return await GetListAsync(line =>
-            {
-                var words = line.Split(' ');
-                return new Group
-                {
-                    numberOfArticles = words[0],
-                    firstArticleNumber = words[1],
-                    lastArticleNumber = words[2],
-                    groupName = words[3],
-                };
-            });
-        
-    }
-    */
-    
-    
+    /**
+     * Exposes the GetListAsync method to the viewmodel
+     * Leftover from initial idea about keeping code DRY - see GetListAsync
+     */
     public async Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync()
     {
-        
            return await GetListAsync(line =>
                    {
                        var words = line.Split(' ');
@@ -177,6 +166,9 @@ public class NewsGroupService : INewsGroupService
                    }); 
     }
     
+    /**
+     * Handles assigning fetched groups to their group attributes
+     */
     public async Task<(string statusCode, Group group)> GetGroupList()
     {
         StreamReader sr = _connection.ReturnStreamReader();
@@ -194,14 +186,12 @@ public class NewsGroupService : INewsGroupService
         string[] words = line.Split(' ');
         statuscode = words[0];
 
-        if (_connection.CheckStatusCode(statuscode) && words.Length >= 5)
+        if (_connection.CheckStatusCode(statuscode) && words.Length >= 5) //makes sure that the group structure remain uniform
         {
-            
             group.numberOfArticles = words[1];
             group.firstArticleNumber = words[2];
             group.lastArticleNumber = words[3];
             group.groupName = words[4];
-            
         }
         else
         {
@@ -212,6 +202,11 @@ public class NewsGroupService : INewsGroupService
     }
     
     
+    /**
+     * Handles reading the newsgroup list
+     * Was initially trying to create one syntactical similar method to handle groups and articles, but realized after creating this
+     * that the methods would be too varied. Kept this method and its exposing method instead of keeping the structure similar across the service
+     */
     public async Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse)
     {
         var list = new List<T>();
@@ -254,42 +249,44 @@ public class NewsGroupService : INewsGroupService
     }
     
 
+    /**
+     * Sends article made in the articleviewmodel to the server
+     */
     public async Task<string> SendCreatedArticle(Article article)
     {
-        await _connection.WaitForSemaphore();
-
         string statuscode = "";
 
         try
         {
             StreamWriter sw = _connection.ReturnStreamWriter();
             StreamReader sr = _connection.ReturnStreamReader();
+
+            Console.WriteLine("This is inside SendCreatedArticle before sending POST");
             await sw.WriteLineAsync(postCommand);
-            statuscode = await sr.ReadLineAsync();
 
-            await sw.FlushAsync();
+            statuscode = await sr.ReadLineAsync(); //empties buffer
 
-            Console.WriteLine(_connection.IsConnected() + " this is the server connection status");
+            Console.WriteLine(statuscode + "This is the STATUSCODE inside SendCreatedArticle after sending POST");
 
             if (string.IsNullOrEmpty(statuscode) || statuscode.Length < 3)
             {
                 return statuscode;
             }
-            
+
             if (statuscode.Substring(0, 3).Equals("340"))
             {
                 await sw.WriteAsync(
                     "From: " + article.fromPoster + "\r\n" +
                     "Newsgroups: " + article.newsGroup + "\r\n" +
-                    "Subject: " + article.subject + "\r\n" +
-                    "\r\n" +
-                    article.message + "\r\n" +
-                    ".\r\n");
+                    "Subject: " + article.subject + "\r\n\r\n" +
+                    article.message +
+                    "\r\n.\r\n");
 
-                await sw.FlushAsync();
+                
             }
-
-            statuscode = await sr.ReadLineAsync();
+            await sw.FlushAsync();
+            
+            statuscode = await sr.ReadLineAsync(); //empties buffer 
             Console.WriteLine(statuscode + " this is the statuscode inside FetchCreatedArticle after sending");
         }
         catch (Exception e)
@@ -297,12 +294,12 @@ public class NewsGroupService : INewsGroupService
             Console.WriteLine(e);
             throw;
         }
-        finally
-        {
-            _connection.ReleaseSemaphore();
-        }
-
+        
         return statuscode;
     }
     
+    public async Task<string> ReadServerResponse()
+    {
+        return await _connection.ReturnStreamReader().ReadLineAsync();
+    }
 }

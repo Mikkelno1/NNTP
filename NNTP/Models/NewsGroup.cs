@@ -1,5 +1,8 @@
 ﻿namespace NNTP.Models;
 
+/**
+ * Holds the NewsGroup object format used for printing to disc
+ */
 public class NewsGroup
 {
     public string name { get; set; }

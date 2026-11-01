@@ -10,8 +10,6 @@ public interface INewsGroupService
     Task CallServerAsync(string command);
 
     Task<(string, Article)> FetchArticleAsync();
-    
-    //Task<(string Statuscode, List<Group> groups)> FetchGroupArticleListAsync();
 
     Task<(string, List<T>)> GetListAsync<T>(Func<string, T> parse);
 
@@ -20,6 +18,6 @@ public interface INewsGroupService
     Task<(string statusCode, Group group)> GetGroupList();
 
     Task<string> SendCreatedArticle(Article article);
-
+    Task<string> ReadServerResponse();
 
 }

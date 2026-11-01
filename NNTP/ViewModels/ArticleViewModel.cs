@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NNTP.Models;
@@ -13,6 +10,9 @@ using NNTP.Services;
 
 namespace NNTP.ViewModels;
 
+/**
+ * Handles all business logic behind the UI related to articles, individual groups and list of groups
+ */
 public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
 {
     private INewsGroupService _ngs;
@@ -27,8 +27,9 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     [ObservableProperty] public string subjectArticle;
     [ObservableProperty] public string messageArticle;
 
+    private Article _article;
+
     public ObservableCollection<Object> NewsGroupCollection { get; } = new();
-    public ObservableCollection<Article> ArticleCollection { get; } = new();
     public ObservableCollection<NewsGroup> FavoriteCollection { get; } = new();
     
 
@@ -36,9 +37,12 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     {
         _ngs = ngs;
         _connection = connection;
-        ReadFavorite();
+        ReadFavorite(); //loads favorites on startup
     }
 
+    /**
+     * Adds the selected item from the listbox to the favorites list
+     */
     [RelayCommand]
     private void AddToFavorite()
     {
@@ -51,9 +55,11 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         {
             StatusMessagePrompt = "Please select a newsgroup";
         }
-        
     }
     
+    /**
+     * Removes the selected item from the favorite list and listbox
+     */
     [RelayCommand]
     private void RemoveFromFavorite()
     {
@@ -79,6 +85,9 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         
     }
     
+    /**
+     * Saves the favorite list to the harddrive as plaintext
+     */
     private void WriteFavorite()
     {
         try
@@ -104,6 +113,9 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         }
     }
 
+    /**
+     * Reads the favorite list from the harddrive
+     */
     private void ReadFavorite()
     {
         try
@@ -138,6 +150,9 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         }
     }
 
+    /**
+     * Passes NNTP commands to the service layer and calls their associated methods
+     */
     [RelayCommand]
     private async Task Prompt()
     {
@@ -146,7 +161,6 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         StatusMessagePrompt = "";
         string[] command = lowerCommand.Split(" ");
         
-        await _connection.WaitForSemaphore();
         try
         {
             switch (command[0])
@@ -163,6 +177,10 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
                     await _ngs.CallServerAsync(lowerCommand);
                     await GetArticle();
                     break;
+                case "date" :
+                    await _ngs.CallServerAsync(lowerCommand);
+                    StatusMessagePrompt = await _ngs.ReadServerResponse();
+                    break;
             }
             
         }
@@ -170,12 +188,11 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         {
             StatusMessagePrompt = e.Message;
         }
-        finally
-        {
-            _connection.ReleaseSemaphore();
-        }
     }
     
+    /**
+     * Handles adding the fetched newsgroup list to the listbox
+     */
     private async Task GetNewsGroupList()
     {
         StatusCode = "";
@@ -192,6 +209,9 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         
     }
     
+    /**
+     * Handles adding the fetched group to the listbox
+     */
     private async Task GetGroup()
     {
         StatusCode = "";
@@ -207,6 +227,9 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         
     }
 
+    /**
+     * Handles adding the fetched article to the listbox
+     */
     private async Task GetArticle()
     {
         StatusCode = "";
@@ -219,21 +242,25 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
         NewsGroupCollection.Add(article);
     }
 
+    /**
+     * Fetches data from the textblocks in the UI and creates a corresponding article object and updates the status message
+     */
     [RelayCommand]
     private async Task CreateArticle()
     {
-        Article article = new();
+        _article = new();
 
-        article.fromPoster = FromArticle;
-        Console.WriteLine(article.fromPoster + " from poster");
-        article.newsGroup = NewsgroupsArticle;
-        Console.WriteLine(article.newsGroup + " to newsgroup");
-        article.subject = SubjectArticle;
-        Console.WriteLine(article.subject + " article subject");
-        article.message = MessageArticle;
-        Console.WriteLine(article.message + " article message");
-        
-        StatusMessagePrompt = await _ngs.SendCreatedArticle(article);
+        _article.fromPoster = FromArticle;
+        Console.WriteLine(_article.fromPoster + " from poster");
+        _article.newsGroup = NewsgroupsArticle;
+        Console.WriteLine(_article.newsGroup + " to newsgroup");
+        _article.subject = SubjectArticle;
+        Console.WriteLine(_article.subject + " article subject");
+        _article.message = MessageArticle;
+        Console.WriteLine(_article.message + " article message");
+
+        StatusMessagePrompt = await _ngs.SendCreatedArticle(_article);
+
     }
     
     

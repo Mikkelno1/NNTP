@@ -2,6 +2,9 @@
 
 namespace NNTP.Models;
 
+/**
+ * Defines the Host object used to establish connections
+ */
 public partial class Host : ObservableObject
 {
     [ObservableProperty] 

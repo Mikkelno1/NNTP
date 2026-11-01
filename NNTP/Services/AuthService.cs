@@ -7,11 +7,14 @@ using NNTP.Models;
 
 namespace NNTP.Services;
 
+/**
+ * Handles all authentication required by the server and encryption/storage of user informatino
+ */
 public class AuthService : IAuthService
 {
-    private IConnection _connection;
-    private const string authInfoUser = "authinfo user ";
-    private const string authInfoPass = "authinfo pass ";
+    private readonly IConnection _connection;
+    private const string AuthInfoUser = "authinfo user ";
+    private const string AuthInfoPass = "authinfo pass ";
     
     
     
@@ -20,28 +23,31 @@ public class AuthService : IAuthService
         _connection = connection;
     }
 
+    /**
+     * Sends username to server and awaits response
+     */
     public async Task<bool> AuthenticateUserName(User user)
     {
-        StreamWriter _sw = _connection.ReturnStreamWriter();
-        StreamReader _sr = _connection.ReturnStreamReader();
-        string statuscode = "";
+        var sw = _connection.ReturnStreamWriter();
+        var sr = _connection.ReturnStreamReader();
+        var statusCode = "";
         
         var access = false;
         
-        await _sw.WriteLineAsync(authInfoUser + user.Username);
-        await _sw.FlushAsync();
+        await sw.WriteLineAsync(AuthInfoUser + user.Username);
+        await sw.FlushAsync();
         
         
-        statuscode = await _sr.ReadLineAsync();
+        statusCode = await sr.ReadLineAsync();
         Console.WriteLine(user.Username + " this is the userbname inside AuthenticateUserName");
-        Console.WriteLine(statuscode + " this is the statuscode inside AuthenticateUserName");
+        Console.WriteLine(statusCode + " this is the statuscode inside AuthenticateUserName");
 
-        if (string.IsNullOrEmpty(statuscode) || statuscode.Length < 3)
+        if (string.IsNullOrEmpty(statusCode) || statusCode.Length < 3)
         {
             return access;
         }
         
-        if (statuscode.Substring(0,3).Equals("381"))
+        if (statusCode.Substring(0,3).Equals("381")) //only needs checking 381 as all other codes are invalid in this context
         {
             access = true;
         }
@@ -49,28 +55,31 @@ public class AuthService : IAuthService
         return access;
     }
 
+    /**
+     * Sends password to server and awaits response
+     */
     public async Task<bool> AuthenticatePassword(User user)
     {
-        StreamWriter _sw = _connection.ReturnStreamWriter();
-        StreamReader _sr = _connection.ReturnStreamReader();
-        string statuscode = "";
+        var sw = _connection.ReturnStreamWriter();
+        var sr = _connection.ReturnStreamReader();
+        var statusCode = "";
         
         var access = false;
         
-        await _sw.WriteLineAsync(authInfoPass + user.Password);
-        await _sw.FlushAsync();
+        await sw.WriteLineAsync(AuthInfoPass + user.Password);
+        await sw.FlushAsync();
 
-        statuscode = await _sr.ReadLineAsync();
+        statusCode = await sr.ReadLineAsync();
         
         Console.WriteLine(user.Password + " this is the password inside AuthenticatePassword");
-        Console.WriteLine(statuscode + " this is the statuscode inside AuthenticatePassword");
+        Console.WriteLine(statusCode + " this is the statuscode inside AuthenticatePassword");
 
-        if (string.IsNullOrEmpty(statuscode) || statuscode.Length < 3)
+        if (string.IsNullOrEmpty(statusCode) || statusCode.Length < 3)
         {
             return access;
         }
         
-        if (statuscode.Substring(0,3).Equals("281"))
+        if (statusCode.Substring(0,3).Equals("281")) //only needs checking 281 as all other codes are invalid in this context
         {
             access = true;
         }
@@ -78,10 +87,13 @@ public class AuthService : IAuthService
         return access;
     }
 
-    
+    /**
+     * Encrypts username and password and saves to disc - yes, very secure
+     * Borrowed from Microsoft documentation
+     */
     public string EncryptInfo(string username, string password)
     {
-        string statusMesasage = "";
+        var statusMessage = "";
         
         try
         {
@@ -111,22 +123,25 @@ public class AuthService : IAuthService
                 }
             }
 
-            statusMesasage = "Info successfully encrypted";
+            statusMessage = "Info successfully encrypted";
         }
         catch (Exception e)
         {
-            statusMesasage = e.Message;
+            statusMessage = e.Message;
         }
 
-        return statusMesasage;
+        return statusMessage;
     }
 
-    
+    /**
+     * Decrypts username and password and loads from disc - yes, very secure
+     * Borrowed from Microsoft documentation
+     */
     public List<string> DecryptInfo()
     {
-        string statusMesasage = "";
-        string username = "";
-        string password = "";
+        var statusMesasage = "";
+        var username = "";
+        var password = "";
         List<string> list = new();
         
         try
