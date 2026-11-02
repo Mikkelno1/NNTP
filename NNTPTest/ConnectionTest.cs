@@ -135,7 +135,7 @@ public class ConnectionTest
     }
 
     [Fact]
-    public async Task WaitforSemaphore_SemaphoreLoadedWhenWaiting()
+    public async Task WaitForSemaphore_SemaphoreLoadedWhenWaiting()
     {
         var connection = new Connection();
         
@@ -149,7 +149,7 @@ public class ConnectionTest
     }
     
     [Fact]
-    public async Task WaitforSemaphore_SemaphoreNotLoadedBecauseFull()
+    public async Task WaitForSemaphore_SemaphoreNotLoadedBecauseFull()
     {
         var connection = new Connection();
 

@@ -169,7 +169,7 @@ public class NewsGroupService : INewsGroupService
     /**
      * Handles assigning fetched groups to their group attributes
      */
-    public async Task<(string statusCode, Group group)> GetGroupList()
+    public async Task<(string statusCode, Group group)> GetGroup()
     {
         StreamReader sr = _connection.ReturnStreamReader();
         string line = await sr.ReadLineAsync();
@@ -200,6 +200,7 @@ public class NewsGroupService : INewsGroupService
 
         return (statuscode, group);
     }
+    
     
     
     /**

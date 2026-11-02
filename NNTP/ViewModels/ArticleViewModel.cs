@@ -177,10 +177,6 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
                     await _ngs.CallServerAsync(lowerCommand);
                     await GetArticle();
                     break;
-                case "date" :
-                    await _ngs.CallServerAsync(lowerCommand);
-                    StatusMessagePrompt = await _ngs.ReadServerResponse();
-                    break;
             }
             
         }
@@ -216,7 +212,7 @@ public partial class ArticleViewModel : ViewModelBase, INotifyCollectionChanged
     {
         StatusCode = "";
         NewsGroupCollection.Clear();
-        var (status, group) = await _ngs.GetGroupList();
+        var (status, group) = await _ngs.GetGroup();
         
         StatusCode = status;
 

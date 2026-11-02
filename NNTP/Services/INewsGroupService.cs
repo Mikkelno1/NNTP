@@ -15,7 +15,7 @@ public interface INewsGroupService
 
     Task<(string Statuscode, List<NewsGroup> newsGroups)> FetchNewsGroupListAsync();
 
-    Task<(string statusCode, Group group)> GetGroupList();
+    Task<(string statusCode, Group group)> GetGroup();
 
     Task<string> SendCreatedArticle(Article article);
     Task<string> ReadServerResponse();

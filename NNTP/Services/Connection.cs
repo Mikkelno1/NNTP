@@ -97,7 +97,7 @@ public class Connection : IConnection
     }
 
     /**
-     * Saves the server and port to a plaintext document on the harddrive for easy loading and loging
+     * Saves the server and port to a plaintext document on the harddrive for easy loading and login
      */
     public string SaveServer(string serverName, string serverPort)
     {
@@ -125,7 +125,7 @@ public class Connection : IConnection
     }
 
     /**
-     * Loads the server and port to a plaintext document on the harddrive for easy loading and loging
+     * Loads the server and port to a plaintext document on the harddrive for easy loading and login
      */
     public List<string> LoadServer()
     {
@@ -146,7 +146,6 @@ public class Connection : IConnection
                     serverPort = loadWriter.ReadLine();
                     list.Add(serverPort);
                 }
-                    
             }
             statusMesasage = "Server successfully loaded";
         }

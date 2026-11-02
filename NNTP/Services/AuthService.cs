@@ -37,10 +37,7 @@ public class AuthService : IAuthService
         await sw.WriteLineAsync(AuthInfoUser + user.Username);
         await sw.FlushAsync();
         
-        
         statusCode = await sr.ReadLineAsync();
-        Console.WriteLine(user.Username + " this is the userbname inside AuthenticateUserName");
-        Console.WriteLine(statusCode + " this is the statuscode inside AuthenticateUserName");
 
         if (string.IsNullOrEmpty(statusCode) || statusCode.Length < 3)
         {
